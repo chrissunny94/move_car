@@ -1,0 +1,68 @@
+\documentclass[conference]{IEEEtran} % IEEE two-column format
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage[capitalise]{cleveref}
+\usepackage{xurl}
+\usepackage{xcolor}
+\usepackage{booktabs} % For professional-looking rules
+\usepackage{tabularx}   % For tables with automatic width adjustment
+\usepackage{subcaption}
+
+\begin{document}
+
+% --- Title & Authors ---
+\title{End-to-End Self-Driving Car Software Stack}
+
+\author{
+    \IEEEauthorblockN{Chris Sunny Thaliyath}
+    \IEEEauthorblockA{Dept. of CSE, IIT Jammu\\
+    \texttt{2023pai9051@iitjammu.ac.in}}
+    \and
+    \IEEEauthorblockN{Suryakanth V. Gangashetty}
+    \IEEEauthorblockA{Koneru Lakshmaiah Education Foundation (LKEF)\\
+    Vaddeswaram - 522305, AP; India\\
+    \texttt{svg@kluniversity.in}}
+}
+
+\maketitle
+
+% --- Abstract ---
+\begin{abstract}
+\input{ieee_paper/00_abstract}
+\end{abstract}
+
+% --- Keywords ---
+\begin{IEEEkeywords}
+ADAS, LiDAR, Camera, Sensor Fusion, Autonomous Driving, Occupancy Grid, ROS
+\end{IEEEkeywords}
+
+% --- Main Sections ---
+\section*{Introduction}
+\input{ieee_paper/01_introduction}
+
+\section*{Related Work}
+\input{ieee_paper/02_related_work}
+
+\section*{System Design}
+\input{ieee_paper/03_system_design}
+
+\section*{Implementation}
+\input{ieee_paper/04_implementation}
+
+\section*{Results}
+\input{ieee_paper/05_results}
+
+\section*{Conclusion}
+\input{ieee_paper/06_conclusion}
+
+
+
+% --- References ---
+% --- References ---
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

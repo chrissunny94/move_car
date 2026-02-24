@@ -1,0 +1,30 @@
+
+The \texttt{move\_car} system successfully demonstrates robust autonomous navigation capabilities through the 
+tight integration of modern perception algorithms with classical planning and control techniques. 
+Our comprehensive evaluation confirms its real-time performance, making it suitable for practical deployment in 
+dynamic environments. Furthermore, its modular architecture ensures adaptability and facilitates future extensions 
+and improvements.
+
+Key advantages of the \texttt{move\_car} system include its direct multi-modal sensor fusion approach, 
+which reduces reliance on costly high-definition maps, and its proven robust operation in complex, 
+real-world driving scenarios within a simulated environment.
+
+Specifically, the \texttt{move\_car} ADAS stack achieves a balanced trade-off between latency, accuracy, 
+and computational complexity, as evidenced in our simulated tests:
+
+\begin{itemize}
+    \item \textbf{Real-Time Performance:} PointPillars, integrated within our perception module, excels with its 
+    fast inference speed (6.84 ms) and balanced accuracy (77.00 Car@R11), proving highly effective for real-time 
+    applications.
+    \item \textbf{High-Precision Tasks:} For scenarios demanding higher precision, CenterPoint focuses on accurate 
+    object localization and classification, demonstrating its capability for detailed environmental understanding.
+    \item \textbf{Complex Environments:} BEVFusion significantly leverages multi-modal fusion of LiDAR and camera 
+    data, providing superior and robust perception, particularly in challenging and complex driving conditions.
+\end{itemize}
+
+Building upon these foundational achievements, future work for the \texttt{move\_car} 
+project will explore several key areas to further enhance its capabilities. 
+These include the integration of advanced anomaly detection mechanisms for improved safety in critical edge cases,
+ the incorporation of language-driven planning modules to enable more intuitive and context-aware high-level 
+ decision-making, and the enhancement of semantic alignment with road topology, potentially utilizing HD maps 
+ or advanced visual cues for increased navigational precision.

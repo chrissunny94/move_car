@@ -1,0 +1,10 @@
+This paper introduces \texttt{move\_car}, 
+a modular and real-time Advanced Driver Assistance System (ADAS) stack that integrates multi-modal perception, 
+dynamic occupancy grid mapping, hierarchical planning, 
+and control for autonomous navigation. 
+The system fuses LiDAR and multi-camera inputs through a CUDA-based BEVFusion approach, enabling robust environment understanding via dynamic occupancy grids. 
+A Model Predictive Control (MPC) framework is employed in closed-loop execution to ensure precise and safe trajectory tracking.
+
+The framework is trained on standard autonomous driving datasets and evaluated within the CARLA simulator on an NVIDIA RTX 3060 platform. 
+Experimental results demonstrate real-time performance and reliability. 
+A comparative study against open-source baselines highlights the effectiveness of the proposed stack, and key limitations along with potential directions for future research are discussed.

@@ -1,0 +1,66 @@
+
+Autonomous driving requires the seamless, real-time integration of perception, planning, and control modules. 
+This integration enables vehicles to interpret their environment, make intelligent decisions, and navigate safely in dynamic real-world settings.
+
+\section*{Motivation}
+
+\subsection*{Reducing Complexity and Increasing Efficiency}
+
+Tesla's success in reducing its codebase from 500,000 to 50,000 lines demonstrates how streamlining an autonomous driving stack accelerates development and improves system performance. A leaner, modular AI stack enhances adaptability and facilitates faster iteration in complex driving scenarios.
+
+\subsection*{Human-Interpretable Decision-Making}
+
+For autonomous systems to gain widespread trust, their decision-making processes must be interpretable. Black-box models often hinder transparency, making debugging and safety validation challenging. Our approach emphasizes explainability to ensure that the system's behavior can be analyzed and understood by developers and regulators alike.
+
+\subsection*{Leveraging LiDAR for Robust Perception}
+
+Given my background as a LiDAR algorithm developer, this work centers around LiDAR-based perception. LiDAR sensors provide rich geometric data essential for robust scene understanding, particularly under challenging environmental conditions where camera-based systems may fail~\cite{lidar_processing,openpcdet}.
+
+\subsection*{Advancing AI with Transformers, VAEs, and LLMs}
+
+Recent developments in AI present opportunities to build more intelligent, adaptable driving systems:
+\begin{itemize}
+    \item \textbf{Transformers:} Enhance spatial reasoning and sequential decision-making in planning and perception~\cite{bevformer}.
+    \item \textbf{Variational Autoencoders (VAEs):} Improve feature extraction and aid in visual anomaly detection.
+    \item \textbf{Large Language Models (LLMs):} Introduce reasoning capabilities into high-level planning and fault interpretation.
+\end{itemize}
+
+\section*{Research Evolution and Design Philosophy}
+
+This project began as an investigation into multi-modal sensor fusion networks such as VAD~\cite{vad}, LMDrive, and PPGeo~\cite{ppgeo}, with the goal of developing a fully end-to-end deep learning model for Advanced Driver Assistance Systems (ADAS). After extensive experimentation—including successful training and inference of models like PointPillars~\cite{pointpillars} and BEVFusion~\cite{cudabevfusion}—it became clear that most such systems ultimately revolve around constructing an occupancy grid~\cite{occnet} and navigating through it.
+
+However, large models like LMDrive and VAD proved computationally infeasible on the available 12GB RTX 3060 Ti GPU, leading to performance bottlenecks during deployment.
+
+This limitation inspired a pivotal design shift: instead of compressing the entire navigation stack into a deep learning model, the system architecture could be modular—mirroring the classical \texttt{move\_base} paradigm~\cite{autoware}. By decoupling perception from planning and control, the system gains interpretability, modularity, and efficiency—qualities essential for real-world Level 3 ADAS deployment.
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=\columnwidth]{images/move_base.png}
+    \caption{Overall architecture of the \texttt{move\_base} system}
+    \label{fig:move_base_arch}
+\end{figure}
+
+\section*{Objective}
+
+\textbf{To design a real-time, explainable, and LiDAR-centric autonomous driving stack that is both computationally efficient and adaptable to real-world complexities.}
+
+\section*{System Overview}
+
+This work presents \texttt{move\_car}, a modular and scalable Advanced Driver Assistance System (ADAS) designed for deployment in diverse environments. The proposed system includes:
+
+\begin{itemize}
+    \item \textbf{Multi-modal sensor fusion:} Fuses LiDAR and multi-camera inputs using CUDA-accelerated BEVFusion~\cite{cudabevfusion} to achieve robust 3D perception.
+    \item \textbf{Dynamic occupancy mapping:} Generates real-time 2D occupancy grid maps~\cite{occnet} to represent both static and dynamic obstacles for efficient planning.
+    \item \textbf{Hierarchical planning:} Combines global route planning with local trajectory refinement to ensure both long-term navigation and short-term safety.
+    \item \textbf{Model Predictive Control (MPC):} Utilizes feedback-based control~\cite{mpc,mpc-review} to generate smooth and precise motion in real-time, even in dynamic scenes.
+\end{itemize}
+
+Unlike many pipelines that depend heavily on high-definition (HD) maps, \texttt{move\_car} emphasizes map-independent planning. By relying on direct sensor fusion and occupancy-based reasoning, it achieves strong generalization and adaptability while reducing dependence on costly prior map data.
+
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=\textwidth]{images/move_car.png}
+    \caption{Overall architecture of the \texttt{move\_car} system.}
+    \label{fig:move_car_arch}
+\end{figure*}
+

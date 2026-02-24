@@ -1,0 +1,122 @@
+\documentclass[12pt, a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage[capitalise]{cleveref}
+\usepackage{authblk} % For author affiliations
+\usepackage{xurl}    % For line breaking in URLs
+\usepackage{xcolor}  % For custom colored text if needed
+\usepackage{ragged2e}
+
+% Bibliography style
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+
+    % -------- TITLE --------
+    {\LARGE\bfseries
+    End-to-End Self-Driving Car Software Stack
+    \par}
+    \vspace{0.5cm}
+
+    % -------- SUBMISSION TEXT --------
+    {\normalsize Thesis Submitted for the award of the Degree}\\[0.3cm]
+    {\normalsize of}\\[0.5cm]
+
+    {\Large\bfseries
+    Master of Technology in Artificial Intelligence \& Machine Learning
+    \par}
+    \vspace{0.5cm}
+
+    {\normalsize by IIT Jammu}
+    \vspace{0.5cm}
+
+    {\normalsize
+    in the Department of Continuing Education Academic Council (CEAC)
+    \par}
+    \vspace{0.5cm}
+
+    % -------- AUTHOR --------
+    {\normalsize By}\\[0.4cm]
+
+    {\Large\bfseries
+    Chris Sunny Thaliyath
+    \par}
+    \vspace{0.3cm}
+
+    {\normalsize
+    2023PAI9051
+    \par}
+    \vspace{0.5cm}
+
+    % -------- SUPERVISOR --------
+    {\normalsize Under the supervision of}\\[0.4cm]
+
+    {\Large\bfseries
+    Dr. Suryakanth V Gangashetty
+    \par}
+    \vspace{0.5cm}
+
+    % -------- LOGO --------
+    \includegraphics[width=0.35\textwidth]{images/IIT_JAMMU_LOGO.png}
+    \vspace{0.5cm}
+
+    % -------- INSTITUTE --------
+    {\normalsize\bfseries
+    Indian Institute of Technology
+    \par}
+    \vspace{0.2cm}
+
+    {\normalsize\bfseries
+    Jammu
+    \par}
+    \vspace{0.3cm}
+
+    {\normalsize
+    July 2025
+    \par}
+
+\end{titlepage}
+
+
+\input{full_paper/declaration}  % Declaration comes AFTER approval sheet
+
+\hypersetup{pageanchor=false}
+\input{full_paper/approval_sheet}
+\hypersetup{pageanchor=true}
+
+
+
+\input{full_paper/00_abstract}
+
+\input{full_paper/07_acknowledment}
+
+
+
+\tableofcontents
+\listoffigures
+\listoftables
+
+% --- Main Chapters ---
+
+\begin{center}
+\textbf{Keywords:} ADAS, LiDAR, Camera, Sensor Fusion, Autonomous Driving, Occupancy Grid, ROS
+\end{center}
+
+\input{full_paper/01_introduction}
+\input{full_paper/02_related_work}
+\input{full_paper/03_system_design}
+\input{full_paper/04_implementation}
+\input{full_paper/05_results}
+\input{full_paper/06_conclusion}
+
+% --- References ---
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+
+\end{document}

@@ -1,0 +1,99 @@
+# ========================
+# ROS Workspaces (catkin)
+# ========================
+*/build/
+*/devel/
+*/logs/
+*/install/
+*/build_isolated/
+*/devel_isolated/
+*/install_isolated/
+*/.catkin_tools/
+.catkin_tools/
+
+ros_ws/.catkin_tools/
+ros_ws/devel/
+ros_ws/build/
+
+
+# Auto-generated catkin files
+CATKIN_IGNORE
+CTestTestfile.cmake
+cmake_install.cmake
+Makefile
+
+# ========================
+# CARLA
+# ========================
+CARLA/Intermediate/
+CARLA/Saved/
+CARLA/Build/
+CARLA/Plugins/
+CARLA/Content/Carla/Maps/generated/
+
+# Carla Python API cache
+PythonAPI/carla/dist/
+PythonAPI/carla/.eggs/
+
+# ========================
+# Autoware / Planning / Perception outputs
+# ========================
+*.pcd
+*.bag
+*.bag.active
+*.db3
+*.json.tmp
+*.yaml.tmp
+
+
+# Autoware logs
+log/
+logs/
+*.log
+
+# ========================
+# Python
+# ========================
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# virtualenv
+env/
+venv/
+.venv/
+
+# ========================
+# Editor / System
+# ========================
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*~
+
+
+# ========================
+# LaTeX / TeXstudio
+# ========================
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.nav
+*.out
+*.run.xml
+*.snm
+*.synctex.gz
+*.toc
+*.txss
+*.pdf  # Uncomment to ignore compiled PDFs as well

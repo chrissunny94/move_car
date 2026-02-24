@@ -1,0 +1,98 @@
+
+The \texttt{move\_car} architecture is meticulously designed to integrate perception, planning, and control into a cohesive Advanced Driver Assistance System (ADAS) stack, enabling robust autonomous navigation in real-time environments. The system's core components are structured as follows:
+
+\begin{itemize}
+    \item \textbf{Perception:} Utilizes \texttt{CUDA-BEVFusion} to effectively fuse inputs from LiDAR and six onboard cameras, generating precise 3D bounding boxes and comprehensive object lists at a rate of 25 FPS. This foundational module ensures a robust and detailed understanding of the vehicle's surrounding environment.
+    \item \textbf{Occupancy Grid Mapping:} Transforms the fused sensor data into dynamic 2D occupancy grids. These grids are crucial for real-time obstacle avoidance and serve as the primary input for subsequent local planning modules.
+    \item \textbf{Planning:} Employs a hierarchical framework that strategically combines global route planning with adaptive local trajectory generation. This dual-layer approach ensures both long-term navigational adherence and immediate, collision-free maneuvers in dynamic scenarios.
+    \item \textbf{Control:} Leverages Model Predictive Control (MPC) to guarantee smooth and feedback-aware execution of planned trajectories. MPC's predictive capabilities enable the system to anticipate future states and maintain precise motion, even in complex driving conditions.
+\end{itemize}
+
+\section*{BEV-Based Perception}
+
+Bird's Eye View (BEV) projection is a central paradigm within the \texttt{move\_car} perception stack. This approach involves transforming raw LiDAR point clouds and features extracted from multi-camera inputs into a unified, top-down spatial frame, which offers a highly intuitive and effective representation for autonomous driving tasks.
+
+\subsection*{BEV Projection and Fusion Techniques}
+
+\begin{itemize}
+    \item \textbf{LiDAR Projection:} LiDAR points are precisely projected into the BEV plane. This process creates dense spatial occupancy representations that accurately reflect the presence and distribution of obstacles in the environment.
+    \item \textbf{Multi-Camera Fusion:} Multi-camera images are fused into the BEV through Inverse Perspective Mapping (IPM). This technique aligns visual features from different camera perspectives into a single BEV, facilitating comprehensive environmental understanding.
+\end{itemize}
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=\columnwidth]{images/bev_projection.png}
+    \caption{LiDAR projection to BEV}
+    \label{fig:bev_projection}
+\end{figure}
+
+\subsection*{BEVDet and BEVFusion Architecture}
+
+The perception backbone of \texttt{move\_car} relies on the advanced capabilities of BEVDet and BEVFusion.
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=\columnwidth]{images/bevdet_architecture.png}
+    \caption{BEVDet architecture for multi-sensor fusion}
+    \label{fig:bevdet_arch}
+\end{figure}
+
+
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=\columnwidth]{images/bev_fusion.png}
+    \caption{BEVFusion output visualization with LiDAR-camera fusion}
+    \label{fig:bevfusion_output}
+\end{figure}
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=\columnwidth]{images/bevfusion_architecture.png}
+    \caption{CUDA-BEVFusion architecture}
+    \label{fig:bevfusion_arch}
+\end{figure}
+
+\subsection*{BEVFormer and Temporal Attention Integration}
+
+While \texttt{move\_car} primarily leverages \texttt{CUDA-BEVFusion} for its perception core, the principles of \textbf{BEVFormer} (using spatiotemporal transformers to generate BEV features from multi-camera sequences) are considered for future enhancements. Unlike traditional projection-based methods, BEVFormer's attention mechanisms directly query relevant image features across time, making it particularly well-suited for dynamic and occluded urban environments.
+
+\section*{Mapping Support: HDMapNet and VECTORMapNet Considerations}
+
+The \texttt{move\_car} system is designed to emphasize map-independent planning for enhanced generalization. However, it acknowledges the benefits of integrating semantic map information. Future developments may explore:
+
+\begin{itemize}
+    \item \textbf{HDMapNet:} A framework enabling real-time generation of semantic High-Definition (HD) maps using only onboard sensors. This approach negates the need for costly and labor-intensive manual global map labeling.
+    \item \textbf{VECTORMapNet:} A system that combines rich semantic cues derived from cameras with precise geometric information from LiDAR in the BEV space. This fusion significantly enhances contextual planning and decision-making capabilities.
+\end{itemize}
+
+\section*{Optimized Inference and System Integration}
+
+To ensure real-time performance and maintain modularity, the entire perception pipeline within \texttt{move\_car} is deployed leveraging the ROS2 framework in conjunction with NVIDIA TensorRT.
+
+\subsection*{Perception Pipeline Design}
+
+The perception pipeline is meticulously engineered for efficiency and accuracy:
+
+\begin{itemize}
+    \item \textbf{Sensor Synchronization:} Critical for multi-modal fusion, LiDAR point clouds and multi-camera inputs are precisely aligned using ROS2 message filters, ensuring temporal consistency of data.
+    \item \textbf{Preprocessing:} Raw point clouds are processed into \texttt{pcl::PointCloud<PointXYZI>} format, while images are compressed using OpenCV JPEG encoding. This minimizes data transfer overhead and optimizes GPU memory utilization.
+    \item \textbf{Inference:} The \texttt{CUDA-BEVFusion} model, a core component, is accelerated via TensorRT. This optimization allows the module to achieve an average latency of approximately 40 ms, sustaining a real-time output rate of 25 FPS.
+    \item \textbf{Coordinate Transformation:} All detected objects are rigorously mapped into a global coordinate frame using \texttt{Eigen::Quaternion} and \texttt{Eigen::Translation3f}, ensuring a unified spatial understanding for downstream planning modules.
+\end{itemize}
+
+\section*{ROS2 Perception Node Implementation}
+
+The perception node, implemented in C++, serves as the crucial interface between the sensor inputs and the core processing logic, integrating seamlessly with the CARLA simulator via its ROS bridge:
+
+\begin{itemize}
+    \item It subscribes to dedicated LiDAR and multi-camera topics, ensuring time-synchronized reception of sensor data.
+    \item Input data is efficiently converted into GPU-compatible formats, which then trigger the \texttt{BEVDet} inference process.
+    \item Finally, the module accurately outputs 3D detections, making them available to subsequent planning and control modules within the ROS2 ecosystem.
+\end{itemize}
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=\columnwidth]{images/carla_ros_bridge.png}
+    \caption{Integration with CARLA via ROS2 bridge}
+    \label{fig:rosnode_carla_bridge}
+\end{figure}

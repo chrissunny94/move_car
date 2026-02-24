@@ -1,0 +1,177 @@
+
+The field of autonomous driving has witnessed significant advancements, particularly in multi-modal sensor fusion for robust 3D object detection, frequently leveraging Bird's Eye View (BEV) perception frameworks. These frameworks are pivotal in transforming diverse sensor inputs into a unified spatial representation, crucial for comprehensive environment understanding. Prominent examples in this domain include \textbf{BEVFormer}~\cite{bevformer}, \textbf{CUDA-BEVFusion}~\cite{cudabevfusion}, and \textbf{VAD}~\cite{vad}. These cutting-edge systems effectively integrate LiDAR and camera data into unified BEV representations, thereby substantially improving detection accuracy and spatial understanding of the environment, a critical step towards safe autonomous navigation.
+
+\begin{figure}[!t]
+    \centering
+     \includegraphics[width=\columnwidth]{images/bevfusion_architecture.png}
+    \caption{Architecture of BEVFusion}
+    \label{fig:bevfusion_arch}
+\end{figure}
+
+\begin{figure}[!t]
+    \centering
+     \includegraphics[width=\columnwidth]{images/bevdet_architecture.png}
+    \caption{Architecture of BEVDet}
+    \label{fig:bevdet_arch}
+\end{figure}
+
+\begin{figure}[!t]
+    \centering
+     \includegraphics[width=\columnwidth]{images/bev_fusion.png}
+    \caption{BEVFusion output visualization}
+    \label{fig:bevfusion_output}
+\end{figure}
+
+Beyond core perception, robust environmental modeling is crucial for autonomous navigation. Occupancy grid-based methods remain a standard approach for dynamic obstacle representation, widely adopted due to their computational efficiency and inherent interpretability~\cite{occnet}. These grids offer a discrete, probabilistic representation of space, making them highly effective for path planning and collision avoidance. Furthermore, specialized approaches like the \href{https://github.com/ANYbotics/elevation_mapping}{\texttt{ANYbotics/elevation\_mapping}} package demonstrate the critical utility of LiDAR-based techniques for real-time terrain and obstacle mapping, providing fine-grained height information essential for navigating uneven or complex terrains. For effective motion control, \textbf{Model Predictive Control (MPC)}~\cite{mpc} is a widely recognized technique for addressing stringent motion constraints and optimizing trajectory execution. Its predictive nature allows for proactive decision-making, especially within dynamic and unpredictable scenes, ensuring safety and efficiency.
+
+While highly integrated systems promise end-to-end learning, many real-world autonomous driving stacks, such as \textbf{Autoware}~\cite{autoware}, opt for a modular architecture. These open-source frameworks meticulously modularize perception, planning, and control components. While this modular separation generally increases component reusability, simplifies development workflows, and enhances system debugging, it can sometimes introduce integration latency and increase overall system complexity in terms of inter-module communication, consequently impacting real-time performance in critical applications.
+
+\begin{figure}[!t]
+    \centering
+     \includegraphics[width=\columnwidth]{images/autoware.png}
+    \caption{Modular pipeline architecture of Autoware-based ADAS stack}
+    \label{fig:autoware_arch}
+\end{figure}
+
+\section*{Motivation and Gaps in Existing End-to-End Frameworks}
+
+Despite the significant advances achieved by end-to-end learning pipelines in autonomous driving, often lauded for their potential simplicity and unified optimization, several persistent challenges continue to limit their practical deployment, particularly for systems aiming for Level 3 autonomy and beyond:
+\begin{itemize}
+    \item \textbf{Limited LiDAR Integration:} A critical observation from current end-to-end (E2E) frameworks is that many do not fully incorporate the rich, precise geometric cues provided by LiDAR sensors. While camera-based methods are advancing rapidly, the inherent robustness of LiDAR in varying lighting and weather conditions, and its direct provision of depth, is often underutilized. This limitation can significantly reduce robustness, particularly in complex or adverse environmental conditions where camera-based systems may struggle with depth estimation or object occlusion.
+    \item \textbf{Absence of Semantic Priors:} There is often a minimal reliance on explicit road topology or semantic priors within these E2E models. This absence means the system might struggle to reason effectively about complex driving rules, lane boundaries, traffic signs, and contextual road information, leading to less predictable and potentially unsafe behavior in nuanced scenarios. An autonomous system needs to understand not just 'what' is there, but 'where' it is relative to road rules and driving context.
+    \item \textbf{High Inference Latency:} A common and particularly challenging drawback of these intricate, large-scale models is their inherent high inference latency. Achieving real-time performance is paramount for safety-critical ADAS applications. However, these complex architectures frequently render real-time deployment challenging, especially on mid-range GPUs such as the NVIDIA RTX 3060 Ti, which is a common and accessible hardware platform for many research and development efforts. This computational burden necessitates significant optimization and often compromises deployment flexibility.
+\end{itemize}
+
+\section*{Research Objectives of \texttt{move\_car}}
+
+Addressing the aforementioned gaps, which stem from a blend of theoretical limitations and practical deployment challenges, this work aims to achieve the following key research objectives through the development of \texttt{move\_car}. Our objectives are rooted in creating a system that is not only performant but also practical and extensible for future autonomous driving research:
+\begin{itemize}
+    \item \textbf{Integrate LiDAR Geometry:} To seamlessly and comprehensively integrate LiDAR-derived geometric features into the autonomous driving pipeline. This is crucial for enabling a more robust and precise understanding of the environment, directly enhancing both perception capabilities (e.g., 3D object detection, environmental mapping) and downstream planning functionalities (e.g., collision avoidance, path generation).
+    \item \textbf{Real-Time Inference Optimization:} To achieve real-time inference speeds through the strategic and pervasive application of TensorRT optimization. Our target is to ensure efficient deployment specifically on an NVIDIA RTX 3060 Ti, demonstrating the feasibility of deploying advanced ADAS solutions on widely available, cost-effective hardware, moving beyond high-end, specialized compute platforms.
+    \item \textbf{Enhanced Interpretability:} To improve the interpretability of autonomous driving decisions. This involves judiciously incorporating advanced AI architectures, such as Transformer networks, for their ability to model complex spatial and temporal relationships, and Variational Autoencoders (VAEs) within the system design to provide a clearer understanding of the model's internal states and decision-making processes, moving away from opaque "black-box" models.
+\end{itemize}
+
+\section*{Comparison with Existing Frameworks}
+
+To provide a comprehensive context for the unique contributions of \texttt{move\_car} and to highlight its distinct architectural philosophy, it is pertinent to compare its design and capabilities with other state-of-the-art autonomous driving systems that often take an end-to-end approach:
+
+\begin{itemize}
+    \item \textbf{VAD}~\cite{vad}: This framework introduces a vectorized scene representation, which enables highly efficient learning of driving policies. VAD excels in creating compact and fast scene understanding, but its tightly coupled end-to-end nature can make it computationally demanding and less flexible for integrating external planning or control algorithms.
+    \item \textbf{LMDrive}: This system leverages the advanced reasoning capabilities of large language models to guide driving behaviors. While innovative in translating high-level textual tasks into actionable commands, LMDrive (and similar LLM-driven approaches) often struggle with real-time performance and lack the explicit safety mechanisms or classical fallbacks inherent in modular ADAS stacks.
+    \item \textbf{PPGeo}~\cite{ppgeo}: This approach integrates semantic priors and sophisticated geometric modeling, primarily to enhance both localization accuracy and planning efficiency. PPGeo emphasizes environmental understanding for policy learning, but like other end-to-end models, its monolithic structure can present challenges for modular development and independent optimization of sub-components.
+\end{itemize}
+
+\begin{figure}[!t]
+    \centering
+     \includegraphics[width=\columnwidth]{images/vad_architecture.png}
+    \caption{Architecture of VAD}
+    \label{fig:vad_arch}
+\end{figure}
+
+\begin{figure}[!t]
+    \centering
+     \includegraphics[width=\columnwidth]{images/ppgeo.jpg}
+    \caption{Architecture of PPGeo}
+    \label{fig:ppgeo_arch}
+\end{figure}
+
+\begin{figure}[!t]
+    \centering
+     \includegraphics[width=\columnwidth]{images/transfusion.png}
+    \caption{Architecture of TransFusion}
+    \label{fig:transfusion_arch}
+\end{figure}
+
+\section*{Key Contributions of \texttt{move\_car}}
+
+The proposed \texttt{move\_car} framework is meticulously designed to address the aforementioned limitations by tightly coupling several critical functionalities, offering a balanced, robust, and deployable solution that bridges advanced perception with reliable control:
+\begin{itemize}
+    \item \textbf{Multi-modal Sensor Fusion:} It incorporates robust multi-modal sensor fusion utilizing CUDA-accelerated BEVFusion. This provides a comprehensive and accurate understanding of the driving environment by intelligently integrating data from diverse sensors (LiDAR and multiple cameras), offering a rich perception output essential for complex scenarios.
+    \item \textbf{Real-Time Occupancy Grid Generation:} The system dynamically generates real-time 2D occupancy grids from the fused LiDAR and camera data. These grids are crucial for effective dynamic obstacle avoidance, serving as foundational input for local planning modules by providing a clear, traversable/non-traversable map of the immediate surroundings.
+    \item \textbf{Hierarchical Planning:} It employs a sophisticated hierarchical planning approach that integrates global routing for long-term navigation with precise local trajectory optimization. This ensures both adherence to overall routes (e.g., navigation to a destination) and immediate collision avoidance with smooth, comfortable maneuvers in dynamic and constrained environments.
+    \item \textbf{Feedback-Based Control:} The framework leverages Model Predictive Control (MPC) for robust feedback-based control. Operating with sub-100 ms latency, MPC ensures smooth and precise execution of planned trajectories, even in rapidly changing environments, by continuously recalculating optimal control inputs based on current vehicle state and predicted future states.
+\end{itemize}
+
+The \texttt{move\_car} system demonstrates high real-time performance, a key differentiator for practical ADAS deployment. The perception module consistently operates at 25 FPS, providing up-to-date environmental understanding, while the planning and control modules achieve latency below 100 ms, ensuring timely and responsive vehicle reactions. Furthermore, its inherently modular design robustly supports future enhancements, including the incorporation of explicit map priors (e.g., from HD maps), advancements in semantic localization techniques, and the seamless integration of more sophisticated learned driving policies, demonstrating its scalability and adaptability.
+
+
+\section*{Design Justification for \texttt{move\_car}}
+While frameworks like VAD, LMDrive, and PPGeo represent highly integrated end-to-end ADAS solutions, often aiming for simplified monolithic pipelines, their tightly coupled architectures frequently lead to several practical disadvantages that limit their real-world applicability and development flexibility:
+\begin{itemize}
+    \item \textbf{Reduced Modularity:} Tightly coupled designs significantly complicate isolated debugging, independent component testing, and incremental improvements. When the entire stack is intertwined, pinpointing the source of an error or upgrading a single perception algorithm without impacting the whole system becomes a formidable challenge.
+    \item \textbf{High Computational Load:} The monolithic nature of these end-to-end systems often results in exceptionally high computational demands. This severely limits their real-time viability, especially on modest hardware like the NVIDIA RTX 3060 Ti, which represents a common and more accessible platform for development and deployment. Achieving real-time performance often necessitates compromises in model complexity or extensive, specific hardware.
+    \item \textbf{Complex Integration:} The intricate integration of the entire navigation stack within a single, unified model restricts the flexibility for testing and incorporating new individual components or alternative algorithms. Researchers are often constrained by the end-to-end model's design, making it difficult to experiment with different planning approaches or control strategies.
+\end{itemize}
+In contrast, the design philosophy of \texttt{move\_car} explicitly advocates for a modular decomposition of the autonomous driving stack. This strategic choice is driven by the need for practical deployability, easier maintenance, and greater experimental flexibility:
+\begin{itemize}
+    \item The \textbf{BEVFusion module specifically handles perception} through an efficient early fusion approach, providing rich and accurate environmental understanding. This dedicated module can be optimized independently and potentially swapped for other perception backbones without redesigning the entire system.
+    \item \textbf{Downstream planning and control functionalities are managed by independent ROS2 modules.} This separation allows for the use of well-established, interpretable, and computationally efficient classical algorithms (like MPC) for these critical tasks, providing clear safety guarantees and easier validation.
+\end{itemize}
+This deliberate isolation allows for fine-grained optimization of each component, simplifies debugging processes by localizing issues, and enables faster iteration cycles for development and testing. Consequently, \texttt{move\_car} successfully balances the strengths of state-of-the-art early fusion perception with the practical advantages of modularity, effectively avoiding the common pitfalls associated with large, monolithic end-to-end systems while achieving robust real-time performance.
+
+
+\begin{table*}[!t]
+\centering
+\caption{Comparison of End-to-End ADAS Frameworks}
+\label{tab:e2e_comparison}
+\begin{tabular}{@{}p{3.5cm}p{4cm}p{4cm}p{4.5cm}@{}}
+\toprule
+\textbf{Framework} & \textbf{Fusion Type} & \textbf{Integrated Components} & \textbf{Limitations} \\
+\midrule
+\textbf{VAD}~\cite{vad} & Early Fusion (LiDAR + Camera) & Perception, Planning, Control & Large model size, limited interpretability, high compute demands \\
+\textbf{LMDrive} & Language-driven Decision Fusion & Perception, Language Reasoning, Control & Not real-time, lacks classical fallback safety mechanisms \\
+\textbf{PPGeo}~\cite{ppgeo} & Semantic-Geometric Fusion & Localization, Semantic Mapping, Planning & High data dependency, not modular \\
+\textbf{BEVFusion (ours)} & Early Fusion & Perception only & Modular but requires planning/control integration \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\noindent
+Table~\ref{tab:model_comparison} summarizes the architectural complexity, GPU requirements, and inference performance of three representative autonomous driving frameworks: VAD, PPGeo, and UniAD. 
+VAD employs a vectorized bird’s-eye-view scene representation with separate motion, map, and planning modules, offering both a high-performance \textit{Base} variant and a real-time \textit{Tiny} variant, the latter achieving up to 16.8~FPS on a single RTX~3090. 
+PPGeo adopts a two-stage self-supervised geometric pre-training strategy to enhance visuomotor policy learning, but reports no explicit runtime benchmarks. 
+UniAD represents an emerging unified driving framework integrating perception, prediction, and planning, though public resources currently lack detailed complexity and performance metrics.
+
+
+
+\begin{table*}[!t]
+\centering
+\caption{Comparison of VAD, PPGeo, and UniAD}
+\label{tab:model_comparison}
+\begin{tabular}{p{3.2cm} p{4.5cm} p{4cm} p{4.3cm}}
+\toprule
+\textbf{Model} & \textbf{Complexity \& Architecture} & \textbf{GPU Training Setup} & \textbf{Inference Speed / Usage} \\
+\midrule
+VAD (Vectorized Scene Representation) & Vectorized BEV-based architecture with motion, map, and planning modules; two variants: VAD-Base (larger) and VAD-Tiny (lighter). & Trained for 60 epochs on 8 × NVIDIA RTX 3090 GPUs, batch size 1 per GPU :contentReference[oaicite:0]{index=0}. & VAD-Tiny achieves up to 9.3× faster inference than prior methods; VAD-Base runs at ~4.5 FPS; VAD-Tiny ~16.8 FPS on one RTX 3090 :contentReference[oaicite:1]{index=1}. \\
+\midrule
+PPGeo (Policy Pre-training via Geometric Modeling) & Two-stage self-supervised framework: Stage 1—pose + depth modeling; Stage 2—ego-motion prediction and photometric optimization. Fully self-supervised visual encoder pre-training. & Code indicates training through two stages using PyTorch. Specific GPU count not specified in the paper or repo :contentReference[oaicite:2]{index=2}. & Primarily a pre-training method for downstream visuomotor tasks; no direct inference speed or runtime metrics reported. \\
+\midrule
+UniAD (Unified Autonomous Driving) & End-to-end unified driving stack (likely includes perception, prediction, and planning modules). Architecture details not fully outlined in available sources. & Not specified in paper or GitHub repo. & No explicit inference time or FPS metrics provided in current publications or GitHub. \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\begin{table}[!t]
+\centering
+\caption{Estimated GPU memory usage for different architectural styles in autonomous driving stacks at 10~Hz inference. Modular designs reduce persistent feature storage and allow selective GPU acceleration, resulting in significant VRAM savings.}
+\label{tab:gpu_memory_savings}
+\begin{tabularx}{\columnwidth}{@{} l c c >{\raggedright\arraybackslash}X @{}}
+\toprule
+\textbf{Architecture Style} & \textbf{VRAM} & \textbf{Saving} & \textbf{Notes} \\
+\midrule
+Monolithic E2E & 12--16~GB & --- & Joint perception-planning-control, large BEV features persist in memory. \\
+Modular + dense BEV & 8--10~GB  & 30--40\% & Modules separated, but high-res BEV features are exchanged. \\
+Modular + occ./vector & 5--8~GB & 50--60\% & Uses compact intermediate representations (occupancy grids, vector maps). \\
+Modular + CPU plan/ctrl & 4--6~GB & 60--70\% & Perception on GPU, planning/control on CPU or embedded accelerators. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section*{Future Work}
+
+Building upon the current robust framework, future directions for the \texttt{move\_car} project will concentrate on extending its capabilities and addressing more complex autonomous driving challenges. These include:
+\begin{itemize}
+    \item \textbf{Anomaly Detection:} Integrating advanced anomaly detection mechanisms to rigorously identify and handle safety-critical edge cases. This will involve developing models capable of recognizing unforeseen situations or sensor failures, thereby further enhancing overall system reliability and robustness in unpredictable real-world scenarios.
+    \item \textbf{Language-Driven Planning:} Incorporating language-driven planning modules to enable more intuitive and context-aware high-level decision-making for the autonomous vehicle. This could involve leveraging large language models to interpret complex human instructions or environmental cues, translating them into high-level navigational strategies.
+    \item \textbf{Semantic Map Alignment:} Enhancing semantic alignment with detailed road topology through the utilization of high-definition (HD) maps or advanced visual cues. This will improve navigation precision, enable more nuanced adherence to traffic laws, and ensure stricter compliance with complex road rules (e.g., turn restrictions, dynamic lane usage).
+\end{itemize}

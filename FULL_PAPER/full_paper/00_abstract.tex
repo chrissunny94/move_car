@@ -1,0 +1,25 @@
+\begin{abstract}
+\justifying
+This paper introduces \texttt{move\_car}, a modular and real-time Advanced Driver
+Assistance System (ADAS) stack that seamlessly integrates multi-modal perception,
+dynamic occupancy grid mapping, hierarchical planning, and control for autonomous
+navigation.
+
+Multimodal Sensor fusion is a very relevant topic in the automotive industry , trying to come up with End to End 
+Deep learning based models for ADAS and Robotics . In my thesis i am authoring a new novel implementation that 
+is seamlessly compatible with early fusion approaches .
+
+The system leverages CUDA-BEVFusion~\cite{cudabevfusion} to fuse LiDAR and
+multi-camera data, enabling robust environment understanding through a dynamic
+occupancy grid~\cite{occnet}.
+
+For trajectory execution, Model Predictive Control (MPC)~\cite{mpc} is employed in
+a closed-loop manner to ensure precise and safe navigation.
+
+Trained on the KITTI~\cite{kitti} and nuScenes~\cite{nuscenes} datasets and evaluated
+within the CARLA simulator~\cite{carla} on an NVIDIA RTX 3060 platform,
+\texttt{move\_car} demonstrates real-time performance and reliability.
+
+I also provide a comparative analysis against open-source baselines and discuss
+current limitations and future directions.
+\end{abstract}
