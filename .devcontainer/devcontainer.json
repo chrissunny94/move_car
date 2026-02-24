@@ -1,0 +1,36 @@
+{
+  "name": "Move_car ROS1 DevContainer",
+
+  "dockerComposeFile": [
+    "docker-compose.yaml"
+  ],
+  "service": "move-car-sim",
+  "workspaceFolder": "/workspace",
+
+  "shutdownAction": "stopCompose",
+  "overrideCommand": false,
+  "remoteUser": "developer",
+
+  "runArgs": [
+    "--gpus=all",
+    "--env=$DISPLAY",
+    "--env=QT_X11_NO_MITSHM=1"
+  ],
+
+  "containerEnv": {
+    "ACCEPT_EULA": "Y",
+    "PRIVACY_CONSENT": "Y",
+    "ROS_DISTRO": "humble",
+    "QT_X11_NO_MITSHM": "1",
+    "DISPLAY": "${localEnv:DISPLAY}"
+  },
+
+  "extensions": [
+    "ms-iot.vscode-ros",
+    "ms-python.python",
+    "ms-vscode.cpptools",
+    "ms-vscode.cmake-tools"
+  ],
+
+  // "postStartCommand": "bash -lc 'source /opt/ros/humble/setup.bash; source /workspace/ros2_ws/install/setup.bash'"
+}

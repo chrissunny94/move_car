@@ -1,0 +1,32 @@
+services:
+  move-car-sim:
+    container_name: move_car_ros1_container
+    runtime: nvidia
+
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+      args:
+        USERNAME: developer
+
+    environment:
+      ACCEPT_EULA: "Y"
+      PRIVACY_CONSENT: "Y"
+      DISPLAY: ${DISPLAY}
+      QT_X11_NO_MITSHM: "1"
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: all
+      ROS_DISTRO: humble
+      RMW_IMPLEMENTATION: rmw_fastrtps_cpp
+      
+    network_mode: host
+    stdin_open: true
+    tty: true
+
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ..:/workspace/:rw
+      - /home/chris/ClosedLoopTesting:/workspace/ClosedLoopTesting
+
+# volumes:
+#   # isaac_user_data:
