@@ -1,5 +1,7 @@
 services:
   move-car-sim:
+    ports:
+      - "5004:5004"
     container_name: move_car_container
     runtime: nvidia
 

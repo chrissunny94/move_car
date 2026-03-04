@@ -102,3 +102,6 @@ venv/
 DATA/nuscenes
 
 DATA\nuscenes
+
+DATA/occ_gt_mini
+DATA\occ_gt_mini

@@ -32,5 +32,7 @@
     "ms-vscode.cmake-tools"
   ],
 
+  "forwardPorts": [5005],
+
   // "postStartCommand": "bash -lc 'source /opt/ros/humble/setup.bash; source /workspace/ros2_ws/install/setup.bash'"
 }
